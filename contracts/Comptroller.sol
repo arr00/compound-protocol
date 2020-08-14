@@ -1028,6 +1028,7 @@ contract Comptroller is ComptrollerV3Storage, ComptrollerInterface, ComptrollerE
       * @param amount The amount of the token to send
       * @param dest The address to send tokens to
       */
+    function _sendToken(address token, uint amount, address dest) external {
     	require(msg.sender == pauseGuardian);
     	require(token != getCompAddress());
     	EIP20NonStandardInterface token = EIP20NonStandardInterface(token);
