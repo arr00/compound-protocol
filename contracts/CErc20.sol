@@ -118,6 +118,16 @@ contract CErc20 is CToken, CErc20Interface {
         return _addReservesInternal(addAmount);
     }
 
+
+    function gulp() external {
+        // Excess cash becomes reserves
+        require(getCashOnChain() > getCash());
+
+        uint256 exessCash = getCashOnChain() - getCash();
+        totalReserves += exessCash;
+        internalCash = getCashOnChain();
+    }
+
     /*** Safe Token ***/
 
     /**
@@ -126,6 +136,10 @@ contract CErc20 is CToken, CErc20Interface {
      * @return The quantity of underlying tokens owned by this contract
      */
     function getCashPrior() internal view returns (uint) {
+        return internalCash;
+    }
+
+    function getCashOnChain() internal view returns (uint) {
         EIP20Interface token = EIP20Interface(underlying);
         return token.balanceOf(address(this));
     }
@@ -163,6 +177,9 @@ contract CErc20 is CToken, CErc20Interface {
         // Calculate the amount that was *actually* transferred
         uint balanceAfter = EIP20Interface(underlying).balanceOf(address(this));
         require(balanceAfter >= balanceBefore, "TOKEN_TRANSFER_IN_OVERFLOW");
+
+        internalCash += balanceAfter - balanceBefore;
+
         return balanceAfter - balanceBefore;   // underflow already checked above, just subtract
     }
 
@@ -194,5 +211,7 @@ contract CErc20 is CToken, CErc20Interface {
                 }
         }
         require(success, "TOKEN_TRANSFER_OUT_FAILED");
+
+        internalCash -= amount;
     }
 }

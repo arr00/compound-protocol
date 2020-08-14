@@ -501,6 +501,11 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
             return (failOpaque(Error.COMPTROLLER_REJECTION, FailureInfo.MINT_COMPTROLLER_REJECTION, allowed), 0);
         }
 
+        if(supplyLimit > 0) {
+            uint newTotalSupply = mintAmount + totalSupply;
+            require(newTotalSupply < supplyLimit, "Supply limit reached");
+        }
+
         /* Verify market's block number equals current block number */
         if (accrualBlockNumber != getBlockNumber()) {
             return (fail(Error.MARKET_NOT_FRESH, FailureInfo.MINT_FRESHNESS_CHECK), 0);

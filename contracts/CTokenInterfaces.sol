@@ -114,6 +114,16 @@ contract CTokenStorage {
      * @notice Mapping of account addresses to outstanding borrow balances
      */
     mapping(address => BorrowSnapshot) internal accountBorrows;
+
+    /**
+    * @notice Supply limit for this CToken
+    */
+    uint256 public supplyLimit;
+    
+    /**
+    * @notice Internal cash counter for this CToken. Should equal underlying.balanceOf(address(this)) unless underlying.transfer() called
+    */
+    uint256 public internalCash;
 }
 
 contract CTokenInterface is CTokenStorage {
@@ -258,10 +268,6 @@ contract CErc20Interface is CErc20Storage {
     function repayBorrow(uint repayAmount) external returns (uint);
     function repayBorrowBehalf(address borrower, uint repayAmount) external returns (uint);
     function liquidateBorrow(address borrower, uint repayAmount, CTokenInterface cTokenCollateral) external returns (uint);
-
-
-    /*** Admin Functions ***/
-
     function _addReserves(uint addAmount) external returns (uint);
 }
 
