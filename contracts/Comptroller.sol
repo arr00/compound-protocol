@@ -1022,6 +1022,54 @@ contract Comptroller is ComptrollerV3Storage, ComptrollerInterface, ComptrollerE
     }
 
     /**
+      * @notice Send the given amount of the given token to the given address
+      * @dev Admin or pauseGuardian function to remove lost assets
+      * @param token The address of the token to send
+      * @param amount The amount of the token to send
+      * @param dest The address to send tokens to
+      */
+    	require(msg.sender == pauseGuardian);
+    	require(token != getCompAddress());
+    	EIP20NonStandardInterface token = EIP20NonStandardInterface(token);
+    	token.transfer(dest,amount);
+    }
+
+
+    /**
+      * @notice Set the given borrow limits for the given cToken markets
+      * @dev Admin or borrowLimitGuardian function to set the borrow limits
+      * @param cTokens The addresses of the markets (tokens) to change the borrow limits for
+      * @param newBorrowLimits The new borrow limit values in underlying (maximum borrowing) to be set
+      */
+    function _setMarketBorrowLimits(CToken[] calldata cTokens, uint256[] calldata newBorrowLimits) external {
+    	require(msg.sender == admin || msg.sender == borrowLimitGuardian); 
+
+        require(cTokens.length != 0 && cTokens.length == newBorrowLimits.length, "invalid input");
+
+        for(uint8 i = 0; i < newBorrowLimits.length; i++) {
+            borrowLimits[address(cTokens[i])] = newBorrowLimits[i];
+            emit NewBorrowLimit(cTokens[i], newBorrowLimits[i]);
+        }
+    }
+
+    /**
+     * @notice Admin function to change the Borrow Limit Guardian
+     * @param newBorrowLimitGuardian The address of the new Borrow Limit Guardian
+     */
+    function _setBorrowLimitGuardian(address newBorrowLimitGuardian) external {
+        require(msg.sender == admin, "only admin");
+
+        // Save current value for inclusion in log
+        address oldBorrowLimitGuardian = borrowLimitGuardian;
+
+        // Store borrowLimitGuardian with value newBorrowLimitGuardian
+        borrowLimitGuardian = newBorrowLimitGuardian;
+
+        // Emit NewBorrowLimitGuardian(OldBorrowLimitGuardian, NewBorrowLimitGuardian)
+        emit NewBorrowLimitGuardian(oldBorrowLimitGuardian, newBorrowLimitGuardian);
+    }
+
+    /**
      * @notice Admin function to change the Pause Guardian
      * @param newPauseGuardian The address of the new Pause Guardian
      * @return uint 0=success, otherwise a failure. (See enum Error for details)
