@@ -501,7 +501,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
             return (failOpaque(Error.COMPTROLLER_REJECTION, FailureInfo.MINT_COMPTROLLER_REJECTION, allowed), 0);
         }
 
-        if(supplyLimit > 0) {
+        if(supplyLimit != 0) {
             uint newTotalSupply = mintAmount + totalSupply;
             require(newTotalSupply < supplyLimit, "Supply limit reached");
         }
@@ -1394,6 +1394,16 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
         emit NewMarketInterestRateModel(oldInterestRateModel, newInterestRateModel);
 
         return uint(Error.NO_ERROR);
+    }
+
+
+    function _setSupplyLimit(uint newSupplyLimit) external {
+        require(msg.sender == admin);
+
+        uint oldSupplyLimit = supplyLimit;
+        supplyLimit = newSupplyLimit;
+
+        emit NewSupplyLimit(oldSupplyLimit, newSupplyLimit);
     }
 
     /*** Safe Token ***/

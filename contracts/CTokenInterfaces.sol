@@ -218,6 +218,8 @@ contract CTokenInterface is CTokenStorage {
      */
     event Failure(uint error, uint info, uint detail);
 
+    event NewSupplyLimit(uint oldSupplyLimit, uint newSupplyLimit);
+
 
     /*** User Interface ***/
 

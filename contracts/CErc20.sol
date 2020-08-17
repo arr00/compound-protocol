@@ -121,10 +121,10 @@ contract CErc20 is CToken, CErc20Interface {
 
     function gulp() external {
         // Excess cash becomes reserves
-        require(getCashOnChain() > getCash());
+        require(getCashOnChain() > getCashPrior());
 
-        uint256 exessCash = getCashOnChain() - getCash();
-        totalReserves += exessCash;
+        uint256 excessCash = getCashOnChain() - getCashPrior();
+        totalReserves += excessCash;
         internalCash = getCashOnChain();
     }
 
