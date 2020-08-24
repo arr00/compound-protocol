@@ -118,14 +118,30 @@ contract CErc20 is CToken, CErc20Interface {
         return _addReservesInternal(addAmount);
     }
 
+    // Withdraw funds sent accidentally
+    function _sendToken(address token, address dest, uint amount) external {
+    	require(msg.sender == admin);
+    	require(token != underlying);
+
+    	EIP20Interface erc20 = EIP20Interface(token);
+    	erc20.transfer(dest,amount);
+    }
+
 
     function gulp() external {
         // Excess cash becomes reserves
-        require(getCashOnChain() > getCashPrior());
+        uint256 cashOnChain = getCashOnChain();
+        uint256 cashPrior = getCashPrior();
+        require(cashOnChain > cashPrior);
 
-        uint256 excessCash = getCashOnChain() - getCashPrior();
-        totalReserves += excessCash;
-        internalCash = getCashOnChain();
+        uint256 excessCash = cashOnChain - cashPrior;
+
+        MathError mathErr;
+        uint256 newReserves;
+        (mathErr, newReserves) = addUInt(totalReserves, excessCash);
+        require(mathErr == MathError.NO_ERROR);
+        totalReserves = newReserves;
+        internalCash = cashOnChain;
     }
 
     /*** Safe Token ***/
@@ -178,9 +194,16 @@ contract CErc20 is CToken, CErc20Interface {
         uint balanceAfter = EIP20Interface(underlying).balanceOf(address(this));
         require(balanceAfter >= balanceBefore, "TOKEN_TRANSFER_IN_OVERFLOW");
 
-        internalCash += balanceAfter - balanceBefore;
+        uint256 transferredIn = balanceAfter - balanceBefore;
 
-        return balanceAfter - balanceBefore;   // underflow already checked above, just subtract
+        MathError mathErr;
+        uint256 newInternalCash;
+        (mathErr, newInternalCash) = addUInt(transferredIn, internalCash);
+        require(mathErr == MathError.NO_ERROR);
+
+        internalCash = newInternalCash;
+
+        return transferredIn;   // underflow already checked above, just subtract
     }
 
     /**
@@ -212,6 +235,10 @@ contract CErc20 is CToken, CErc20Interface {
         }
         require(success, "TOKEN_TRANSFER_OUT_FAILED");
 
-        internalCash -= amount;
+        MathError mathErr;
+        uint256 newInternalCash;
+        (mathErr, newInternalCash) = subUInt(internalCash, amount);
+        require(mathErr == MathError.NO_ERROR);
+        internalCash = newInternalCash;
     }
 }

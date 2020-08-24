@@ -265,6 +265,30 @@ async function setReserveFactor(world: World, from: string, cToken: CToken, rese
   return world;
 }
 
+async function setSupplyLimit(world: World, from: string, cToken: CToken, supplyLimit: NumberV): Promise<World> {
+  let invokation = await invoke(world, cToken.methods._setSupplyLimit(supplyLimit.encode()), from, CTokenErrorReporter);
+
+  world = addAction(
+    world,
+    `CToken ${cToken.name}: ${describeUser(world, from)} sets supply limit to ${supplyLimit.show()}`,
+    invokation
+  );
+
+  return world;
+}
+
+async function gulp(world: World, from: string, cToken: CToken): Promise<World> {
+  let invokation = await invoke(world, cToken.methods.gulp(), from, CTokenErrorReporter);
+
+  world = addAction(
+    world,
+    `CToken ${cToken.name}: Gulp`,
+    invokation
+  );
+
+  return world;
+}
+
 async function setInterestRateModel(world: World, from: string, cToken: CToken, interestRateModel: string): Promise<World> {
   let invokation = await invoke(world, cToken.methods._setInterestRateModel(interestRateModel), from, CTokenErrorReporter);
 
@@ -720,6 +744,33 @@ export function cTokenCommands() {
         new Arg("reserveFactor", getExpNumberV)
       ],
       (world, from, { cToken, reserveFactor }) => setReserveFactor(world, from, cToken, reserveFactor),
+      { namePos: 1 }
+    ),
+    new Command<{ cToken: CToken, supplyLimit: NumberV }>(`
+        #### SetSupplyLimit
+
+        * "CToken <cToken> SetSupplyLimit supplyLimit:<Number>" - Sets the supply limit for the cToken
+          * E.g. "CToken cZRX SupplyLimit 100e18"
+      `,
+      "SetSupplyLimit",
+      [
+        new Arg("cToken", getCTokenV),
+        new Arg("supplyLimit", getExpNumberV)
+      ],
+      (world, from, { cToken, supplyLimit }) => setSupplyLimit(world, from, cToken, supplyLimit),
+      { namePos: 1 }
+    ),
+    new Command<{ cToken: CToken}>(`
+        #### Gulp
+
+        * "CToken <cToken> Gulp" - Gulps for the cToken
+          * E.g. "CToken cZRX Gulp"
+      `,
+      "Gulp",
+      [
+        new Arg("cToken", getCTokenV)
+      ],
+      (world, from, { cToken }) => gulp(world, from, cToken),
       { namePos: 1 }
     ),
     new Command<{ cToken: CToken, interestRateModel: AddressV }>(`
