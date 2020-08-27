@@ -31,8 +31,6 @@ contract CErc20Delegate is CErc20, CDelegateInterface {
         // Set internal cash when becoming implementation
         EIP20Interface token = EIP20Interface(underlying);
         internalCash = token.balanceOf(address(this));
-
-
     }
 
     /**

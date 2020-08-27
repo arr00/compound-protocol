@@ -271,6 +271,9 @@ contract CErc20Interface is CErc20Storage {
     function repayBorrowBehalf(address borrower, uint repayAmount) external returns (uint);
     function liquidateBorrow(address borrower, uint repayAmount, CTokenInterface cTokenCollateral) external returns (uint);
     function _addReserves(uint addAmount) external returns (uint);
+    function gulp() external;
+
+    
 }
 
 contract CDelegationStorage {

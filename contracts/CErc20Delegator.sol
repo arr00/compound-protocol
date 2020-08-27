@@ -392,6 +392,9 @@ contract CErc20Delegator is CTokenInterface, CErc20Interface, CDelegatorInterfac
         newInterestRateModel; // Shh
         delegateAndReturn();
     }
+    function gulp() external {
+        delegateAndReturn();
+    }
 
     /**
      * @notice Internal method to delegate execution to another contract
