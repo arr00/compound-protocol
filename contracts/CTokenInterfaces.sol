@@ -116,9 +116,9 @@ contract CTokenStorage {
     mapping(address => BorrowSnapshot) internal accountBorrows;
 
     /**
-    * @notice Supply limit for this CToken
+    * @notice Supply cap for this CToken
     */
-    uint256 public supplyLimit;
+    uint256 public supplyCap;
     
     /**
     * @notice Internal cash counter for this CToken. Should equal underlying.balanceOf(address(this)) unless underlying.transfer() called
@@ -218,7 +218,7 @@ contract CTokenInterface is CTokenStorage {
      */
     event Failure(uint error, uint info, uint detail);
 
-    event NewSupplyLimit(uint oldSupplyLimit, uint newSupplyLimit);
+    event NewSupplyCap(uint oldSupplyCap, uint newSupplyCap);
 
 
     /*** User Interface ***/
@@ -250,6 +250,7 @@ contract CTokenInterface is CTokenStorage {
     function _setReserveFactor(uint newReserveFactorMantissa) external returns (uint);
     function _reduceReserves(uint reduceAmount) external returns (uint);
     function _setInterestRateModel(InterestRateModel newInterestRateModel) public returns (uint);
+    function _setSupplyCap(uint newSupplyCap) external;
 }
 
 contract CErc20Storage {

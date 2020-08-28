@@ -47,8 +47,8 @@ export interface CTokenMethods {
   pendingAdmin(): Callable<string>;
   _setPendingAdmin(address: string): Sendable<number>;
   _acceptAdmin(): Sendable<number>;
-  _setSupplyLimit(amount: encodedNumber): Sendable<void>;
-  supplyLimit(): Callable<number>;
+  _setSupplyCap(amount: encodedNumber): Sendable<void>;
+  supplyCap(): Callable<number>;
   gulp(): Sendable<void>;
 }
 

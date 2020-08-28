@@ -395,6 +395,10 @@ contract CErc20Delegator is CTokenInterface, CErc20Interface, CDelegatorInterfac
     function gulp() external {
         delegateAndReturn();
     }
+    function _setSupplyCap(uint supplyCap) external {
+        supplyCap;
+        delegateAndReturn();
+    }
 
     /**
      * @notice Internal method to delegate execution to another contract

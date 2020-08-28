@@ -265,12 +265,12 @@ async function setReserveFactor(world: World, from: string, cToken: CToken, rese
   return world;
 }
 
-async function setSupplyLimit(world: World, from: string, cToken: CToken, supplyLimit: NumberV): Promise<World> {
-  let invokation = await invoke(world, cToken.methods._setSupplyLimit(supplyLimit.encode()), from, CTokenErrorReporter);
+async function setSupplyCap(world: World, from: string, cToken: CToken, supplyCap: NumberV): Promise<World> {
+  let invokation = await invoke(world, cToken.methods._setSupplyCap(supplyCap.encode()), from, CTokenErrorReporter);
 
   world = addAction(
     world,
-    `CToken ${cToken.name}: ${describeUser(world, from)} sets supply limit to ${supplyLimit.show()}`,
+    `CToken ${cToken.name}: ${describeUser(world, from)} sets supply cap to ${supplyCap.show()}`,
     invokation
   );
 
@@ -746,18 +746,18 @@ export function cTokenCommands() {
       (world, from, { cToken, reserveFactor }) => setReserveFactor(world, from, cToken, reserveFactor),
       { namePos: 1 }
     ),
-    new Command<{ cToken: CToken, supplyLimit: NumberV }>(`
-        #### SetSupplyLimit
+    new Command<{ cToken: CToken, supplyCap: NumberV }>(`
+        #### SetSupplyCap
 
-        * "CToken <cToken> SetSupplyLimit supplyLimit:<Number>" - Sets the supply limit for the cToken
-          * E.g. "CToken cZRX SupplyLimit 100e18"
+        * "CToken <cToken> SetSupplyCap supplyCap:<Number>" - Sets the supply cap for the cToken
+          * E.g. "CToken cZRX SupplyCap 100e18"
       `,
-      "SetSupplyLimit",
+      "SetSupplyCap",
       [
         new Arg("cToken", getCTokenV),
-        new Arg("supplyLimit", getExpNumberV)
+        new Arg("supplyCap", getNumberV)
       ],
-      (world, from, { cToken, supplyLimit }) => setSupplyLimit(world, from, cToken, supplyLimit),
+      (world, from, { cToken, supplyCap }) => setSupplyCap(world, from, cToken, supplyCap),
       { namePos: 1 }
     ),
     new Command<{ cToken: CToken}>(`
