@@ -8,8 +8,8 @@ Test "Supply Cap test"
     Support cBAT collateralFactor:0.5
     Prep Geoff Some BAT cBAT
     Mint Geoff 50e18 cBAT
-    CToken cBAT SetSupplyCap (40e18)
-    Assert Equal (CToken cBAT SupplyCap) (40e18)
+    CToken cBAT SetUnderlyingSupplyCap (40e18)
+    Assert Equal (CToken cBAT UnderlyingSupplyCap) (40e18)
     AllowFailures
     Mint Geoff 10e18 cBAT
     Assert Revert

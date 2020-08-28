@@ -307,6 +307,14 @@ contract CErc20Delegator is CTokenInterface, CErc20Interface, CDelegatorInterfac
     }
 
     /**
+     * @notice Gulps excess contract cash to reserves
+     * @dev This function calculates excess ERC20 gained from a ERC20.transfer() call and adds the excess to reserves.
+     */
+    function gulp() external {
+        delegateAndReturn();
+    }
+
+    /**
      * @notice Transfers collateral tokens (this market) to the liquidator.
      * @dev Will fail unless called by another cToken during the process of liquidation.
      *  Its absolutely critical to use msg.sender as the borrowed cToken and not a parameter.
@@ -392,11 +400,14 @@ contract CErc20Delegator is CTokenInterface, CErc20Interface, CDelegatorInterfac
         newInterestRateModel; // Shh
         delegateAndReturn();
     }
-    function gulp() external {
-        delegateAndReturn();
-    }
-    function _setSupplyCap(uint supplyCap) external {
-        supplyCap;
+
+    /**
+     * @notice Sets the underlying supply cap to the given value
+     * @dev Admin function to set the underlying supply cap
+     * @param newUnderlyingSupplyCap the new underlying supply cap
+     **/
+    function _setUnderlyingSupplyCap(uint newUnderlyingSupplyCap) external {
+        newUnderlyingSupplyCap;
         delegateAndReturn();
     }
 

@@ -501,9 +501,19 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
             return (failOpaque(Error.COMPTROLLER_REJECTION, FailureInfo.MINT_COMPTROLLER_REJECTION, allowed), 0);
         }
 
-        if(supplyCap != 0) {
-            uint newTotalUnderlyingSupply = mintAmount + internalCash + totalBorrows - totalReserves;
-            require(newTotalUnderlyingSupply < supplyCap, "Supply cap reached");
+        // Enforce underlying supply cap. Value of 0 corresponds to unlimited minting
+        if(underlyingSupplyCap != 0) {
+            uint netUnderlyingSupply;
+            uint newNetUnderlyingSupply;
+            MathError mathErr;
+
+            (mathErr, netUnderlyingSupply) = addThenSubUInt(internalCash, totalBorrows, totalReserves);
+            require(mathErr == MathError.NO_ERROR, "internal cash overflow");
+
+            (mathErr, newNetUnderlyingSupply) = addUInt(netUnderlyingSupply,mintAmount);
+            require(mathErr == MathError.NO_ERROR, "netUnderlyingSupply overflow");
+
+            require(newNetUnderlyingSupply < underlyingSupplyCap, "supply cap reached");
         }
 
         /* Verify market's block number equals current block number */
@@ -1396,14 +1406,18 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
         return uint(Error.NO_ERROR);
     }
 
-
-    function _setSupplyCap(uint newSupplyCap) external {
+    /**
+     * @notice Sets the underlying supply cap to the given value
+     * @dev Admin function to set the underlying supply cap
+     * @param newUnderlyingSupplyCap the new underlying supply cap
+     **/
+    function _setUnderlyingSupplyCap(uint newUnderlyingSupplyCap) external {
         require(msg.sender == admin, "only admin can set supply cap");
 
-        uint oldSupplyCap = supplyCap;
-        supplyCap = newSupplyCap;
+        uint oldUnderlyingSupplyCap = underlyingSupplyCap;
+        underlyingSupplyCap = newUnderlyingSupplyCap;
 
-        emit NewSupplyCap(oldSupplyCap, newSupplyCap);
+        emit NewUnderlyingSupplyCap(oldUnderlyingSupplyCap, newUnderlyingSupplyCap);
     }
 
     /*** Safe Token ***/

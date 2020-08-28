@@ -109,8 +109,8 @@ async function getInterestRate(world: World, cToken: CToken): Promise<NumberV> {
 async function getImplementation(world: World, cToken: CToken): Promise<AddressV> {
   return new AddressV(await (cToken as CErc20Delegator).methods.implementation().call());
 }
-async function getSupplyCap(world: World, cToken: CToken): Promise<NumberV> {
-  return new NumberV(await cToken.methods.supplyCap().call());
+async function getUnderlyingSupplyCap(world: World, cToken: CToken): Promise<NumberV> {
+  return new NumberV(await cToken.methods.underlyingSupplyCap().call());
 }
 
 export function cTokenFetchers() {
@@ -343,16 +343,16 @@ export function cTokenFetchers() {
     ),
 
     new Fetcher<{ cToken: CToken }, NumberV>(`
-        #### SupplyCap
+        #### UnderlyingSupplyCap
 
-        * "CToken <CToken> SupplyCap" - Returns the cToken's supply cap
-          * E.g. "CToken cZRX SupplyCap"
+        * "CToken <CToken> UnderlyingSupplyCap" - Returns the cToken's underlying supply cap
+          * E.g. "CToken cZRX UnderlyingSupplyCap"
       `,
-      "SupplyCap",
+      "UnderlyingSupplyCap",
       [
         new Arg("cToken", getCTokenV)
       ],
-      (world, { cToken }) => getSupplyCap(world, cToken),
+      (world, { cToken }) => getUnderlyingSupplyCap(world, cToken),
       { namePos: 1 }
     ),
 

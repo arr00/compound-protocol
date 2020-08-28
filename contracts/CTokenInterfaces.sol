@@ -116,9 +116,9 @@ contract CTokenStorage {
     mapping(address => BorrowSnapshot) internal accountBorrows;
 
     /**
-    * @notice Supply cap for this CToken
+    * @notice Underlying supply cap for this CToken enforced in the mintFresh function
     */
-    uint256 public supplyCap;
+    uint256 public underlyingSupplyCap;
     
     /**
     * @notice Internal cash counter for this CToken. Should equal underlying.balanceOf(address(this)) unless underlying.transfer() called
@@ -193,6 +193,12 @@ contract CTokenInterface is CTokenStorage {
      */
     event NewReserveFactor(uint oldReserveFactorMantissa, uint newReserveFactorMantissa);
 
+
+    /**
+     * @notice Event emitted when the underlying supply cap is changed
+     */
+     event NewUnderlyingSupplyCap(uint oldUnderlyingSupplyCap, uint newUnderlyingSupplyCap);
+
     /**
      * @notice Event emitted when the reserves are added
      */
@@ -217,8 +223,6 @@ contract CTokenInterface is CTokenStorage {
      * @notice Failure event
      */
     event Failure(uint error, uint info, uint detail);
-
-    event NewSupplyCap(uint oldSupplyCap, uint newSupplyCap);
 
 
     /*** User Interface ***/
@@ -250,7 +254,7 @@ contract CTokenInterface is CTokenStorage {
     function _setReserveFactor(uint newReserveFactorMantissa) external returns (uint);
     function _reduceReserves(uint reduceAmount) external returns (uint);
     function _setInterestRateModel(InterestRateModel newInterestRateModel) public returns (uint);
-    function _setSupplyCap(uint newSupplyCap) external;
+    function _setUnderlyingSupplyCap(uint newUnderlyingSupplyCap) external;
 }
 
 contract CErc20Storage {

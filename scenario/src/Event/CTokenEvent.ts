@@ -265,12 +265,12 @@ async function setReserveFactor(world: World, from: string, cToken: CToken, rese
   return world;
 }
 
-async function setSupplyCap(world: World, from: string, cToken: CToken, supplyCap: NumberV): Promise<World> {
-  let invokation = await invoke(world, cToken.methods._setSupplyCap(supplyCap.encode()), from, CTokenErrorReporter);
+async function setUnderlyingSupplyCap(world: World, from: string, cToken: CToken, underlyingSupplyCap: NumberV): Promise<World> {
+  let invokation = await invoke(world, cToken.methods._setUnderlyingSupplyCap(underlyingSupplyCap.encode()), from, CTokenErrorReporter);
 
   world = addAction(
     world,
-    `CToken ${cToken.name}: ${describeUser(world, from)} sets supply cap to ${supplyCap.show()}`,
+    `CToken ${cToken.name}: ${describeUser(world, from)} sets underlying supply cap to ${underlyingSupplyCap.show()}`,
     invokation
   );
 
@@ -746,18 +746,18 @@ export function cTokenCommands() {
       (world, from, { cToken, reserveFactor }) => setReserveFactor(world, from, cToken, reserveFactor),
       { namePos: 1 }
     ),
-    new Command<{ cToken: CToken, supplyCap: NumberV }>(`
-        #### SetSupplyCap
+    new Command<{ cToken: CToken, underlyingSupplyCap: NumberV }>(`
+        #### SetUnderlyingSupplyCap
 
-        * "CToken <cToken> SetSupplyCap supplyCap:<Number>" - Sets the supply cap for the cToken
-          * E.g. "CToken cZRX SupplyCap 100e18"
+        * "CToken <cToken> SetUnderlyingSupplyCap underlyingSupplyCap:<Number>" - Sets the underlying supply cap for the cToken
+          * E.g. "CToken cZRX SetUnderlyingSupplyCap 100e18"
       `,
-      "SetSupplyCap",
+      "SetUnderlyingSupplyCap",
       [
         new Arg("cToken", getCTokenV),
-        new Arg("supplyCap", getNumberV)
+        new Arg("underlyingSupplyCap", getNumberV)
       ],
-      (world, from, { cToken, supplyCap }) => setSupplyCap(world, from, cToken, supplyCap),
+      (world, from, { cToken, underlyingSupplyCap }) => setUnderlyingSupplyCap(world, from, cToken, underlyingSupplyCap),
       { namePos: 1 }
     ),
     new Command<{ cToken: CToken}>(`
