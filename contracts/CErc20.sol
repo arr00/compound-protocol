@@ -139,7 +139,7 @@ contract CErc20 is CToken, CErc20Interface {
         MathError mathErr;
         uint256 newReserves;
         (mathErr, newReserves) = addUInt(totalReserves, excessCash);
-        require(mathErr == MathError.NO_ERROR);
+        require(mathErr == MathError.NO_ERROR, "reserves overflow");
         totalReserves = newReserves;
         internalCash = cashOnChain;
     }
@@ -194,7 +194,7 @@ contract CErc20 is CToken, CErc20Interface {
         uint balanceAfter = EIP20Interface(underlying).balanceOf(address(this));
         require(balanceAfter >= balanceBefore, "TOKEN_TRANSFER_IN_OVERFLOW");
 
-        uint256 transferredIn = balanceAfter - balanceBefore;
+        uint256 transferredIn = balanceAfter - balanceBefore; // underflow already checked above, just subtract
 
         MathError mathErr;
         uint256 newInternalCash;
@@ -203,7 +203,7 @@ contract CErc20 is CToken, CErc20Interface {
 
         internalCash = newInternalCash;
 
-        return transferredIn;   // underflow already checked above, just subtract
+        return transferredIn;
     }
 
     /**

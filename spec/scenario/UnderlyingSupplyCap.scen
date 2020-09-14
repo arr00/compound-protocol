@@ -1,5 +1,5 @@
 
-Test "Supply Cap test"
+Test "Underlying Supply Cap test"
 	PrintTransactionLogs
 	NewComptroller price:1.0
     NewCToken ZRX cZRX

@@ -507,8 +507,8 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
             uint newNetUnderlyingSupply;
             MathError mathErr;
 
-            (mathErr, netUnderlyingSupply) = addThenSubUInt(internalCash, totalBorrows, totalReserves);
-            require(mathErr == MathError.NO_ERROR, "internal cash overflow");
+            (mathErr, netUnderlyingSupply) = addThenSubUInt(getCashPrior(), totalBorrows, totalReserves);
+            require(mathErr == MathError.NO_ERROR, "cash prior overflow");
 
             (mathErr, newNetUnderlyingSupply) = addUInt(netUnderlyingSupply,mintAmount);
             require(mathErr == MathError.NO_ERROR, "netUnderlyingSupply overflow");
@@ -1409,10 +1409,10 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
     /**
      * @notice Sets the underlying supply cap to the given value
      * @dev Admin function to set the underlying supply cap
-     * @param newUnderlyingSupplyCap the new underlying supply cap
+     * @param newUnderlyingSupplyCap the new underlying supply cap. CToken will not alow minting past this point
      **/
     function _setUnderlyingSupplyCap(uint newUnderlyingSupplyCap) external {
-        require(msg.sender == admin, "only admin can set supply cap");
+        require(msg.sender == admin, "only admin can set underlying supply cap");
 
         uint oldUnderlyingSupplyCap = underlyingSupplyCap;
         underlyingSupplyCap = newUnderlyingSupplyCap;
