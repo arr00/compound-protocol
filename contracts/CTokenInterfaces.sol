@@ -116,7 +116,7 @@ contract CTokenStorage {
     mapping(address => BorrowSnapshot) internal accountBorrows;
 }
 
-contract CTokenStorageV2 is CTokenStorageV2 {
+contract CTokenStorageV2 is CTokenStorage {
     /**
     * @notice Underlying supply cap for this CToken enforced in the mintFresh function
     */
@@ -261,7 +261,7 @@ contract CErc20Storage {
     address public underlying;
 
     /**
-    * @notice Internal cash counter for this CToken. Should equal underlying.balanceOf(address(this)) for CERC20. 
+    * @notice Internal cash counter for this CToken. Should equal underlying.balanceOf(address(this)) for CERC20.
     */
     uint256 public internalCash;
 }
@@ -279,9 +279,9 @@ contract CErc20Interface is CErc20Storage {
     function liquidateBorrow(address borrower, uint repayAmount, CTokenInterface cTokenCollateral) external returns (uint);
     function gulp() external;
     function _addReserves(uint addAmount) external returns (uint);
-    
 
-    
+
+
 }
 
 contract CDelegationStorage {
