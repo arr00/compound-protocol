@@ -114,14 +114,16 @@ contract CTokenStorage {
      * @notice Mapping of account addresses to outstanding borrow balances
      */
     mapping(address => BorrowSnapshot) internal accountBorrows;
+}
 
+contract CTokenStorageV2 is CTokenStorageV2 {
     /**
     * @notice Underlying supply cap for this CToken enforced in the mintFresh function
     */
     uint256 public underlyingSupplyCap;
 }
 
-contract CTokenInterface is CTokenStorage {
+contract CTokenInterface is CTokenStorageV2 {
     /**
      * @notice Indicator that this is a CToken contract (for inspection)
      */

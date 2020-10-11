@@ -132,7 +132,7 @@ contract CErc20 is CToken, CErc20Interface {
         // Excess cash becomes reserves
         uint256 cashOnChain = getCashOnChain();
         uint256 cashPrior = getCashPrior();
-        require(cashOnChain > cashPrior);
+        require(cashOnChain > cashPrior, "Cash on chain not greater than internal cash");
 
         uint256 excessCash = cashOnChain - cashPrior;
 
