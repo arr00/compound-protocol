@@ -1,6 +1,5 @@
 
 Test "Underlying Supply Cap test"
-	PrintTransactionLogs
 	NewComptroller price:1.0
     NewCToken ZRX cZRX
     NewCToken BAT cBAT
