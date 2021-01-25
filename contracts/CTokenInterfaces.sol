@@ -116,14 +116,7 @@ contract CTokenStorage {
     mapping(address => BorrowSnapshot) internal accountBorrows;
 }
 
-contract CTokenStorageV2 is CTokenStorage {
-    /**
-    * @notice Underlying supply cap for this CToken enforced in the mintFresh function
-    */
-    uint256 public underlyingSupplyCap;
-}
-
-contract CTokenInterface is CTokenStorageV2 {
+contract CTokenInterface {
     /**
      * @notice Indicator that this is a CToken contract (for inspection)
      */
@@ -259,14 +252,16 @@ contract CErc20Storage {
      * @notice Underlying asset for this CToken
      */
     address public underlying;
+}
 
+contract CErc20Storage2 is CErc20Storage {
     /**
     * @notice Internal cash counter for this CToken. Should equal underlying.balanceOf(address(this)) for CERC20.
     */
     uint256 public internalCash;
 }
 
-contract CErc20Interface is CErc20Storage {
+contract CErc20Interface is CErc20Storage2 {
 
     /*** User Interface ***/
 
@@ -278,10 +273,11 @@ contract CErc20Interface is CErc20Storage {
     function repayBorrowBehalf(address borrower, uint repayAmount) external returns (uint);
     function liquidateBorrow(address borrower, uint repayAmount, CTokenInterface cTokenCollateral) external returns (uint);
     function gulp() external;
+
+
+    /*** Admin Functions ***/
+
     function _addReserves(uint addAmount) external returns (uint);
-
-
-
 }
 
 contract CDelegationStorage {

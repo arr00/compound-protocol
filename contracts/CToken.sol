@@ -501,21 +501,6 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
             return (failOpaque(Error.COMPTROLLER_REJECTION, FailureInfo.MINT_COMPTROLLER_REJECTION, allowed), 0);
         }
 
-        // Enforce underlying supply cap. Value of 0 corresponds to unlimited minting
-        if(underlyingSupplyCap != 0) {
-            uint netUnderlyingSupply;
-            uint newNetUnderlyingSupply;
-            MathError mathErr;
-
-            (mathErr, netUnderlyingSupply) = addThenSubUInt(getCashPrior(), totalBorrows, totalReserves);
-            require(mathErr == MathError.NO_ERROR, "cash prior overflow");
-
-            (mathErr, newNetUnderlyingSupply) = addUInt(netUnderlyingSupply,mintAmount);
-            require(mathErr == MathError.NO_ERROR, "netUnderlyingSupply overflow");
-
-            require(newNetUnderlyingSupply < underlyingSupplyCap, "supply cap reached");
-        }
-
         /* Verify market's block number equals current block number */
         if (accrualBlockNumber != getBlockNumber()) {
             return (fail(Error.MARKET_NOT_FRESH, FailureInfo.MINT_FRESHNESS_CHECK), 0);
@@ -1404,20 +1389,6 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
         emit NewMarketInterestRateModel(oldInterestRateModel, newInterestRateModel);
 
         return uint(Error.NO_ERROR);
-    }
-
-    /**
-     * @notice Sets the underlying supply cap to the given value
-     * @dev Admin function to set the underlying supply cap
-     * @param newUnderlyingSupplyCap the new underlying supply cap. CToken will not alow minting past this point
-     **/
-    function _setUnderlyingSupplyCap(uint newUnderlyingSupplyCap) external {
-        require(msg.sender == admin, "only admin can set underlying supply cap");
-
-        uint oldUnderlyingSupplyCap = underlyingSupplyCap;
-        underlyingSupplyCap = newUnderlyingSupplyCap;
-
-        emit NewUnderlyingSupplyCap(oldUnderlyingSupplyCap, newUnderlyingSupplyCap);
     }
 
     /*** Safe Token ***/
