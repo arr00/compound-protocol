@@ -7,7 +7,7 @@ import "./CToken.sol";
  * @notice CTokens which wrap an EIP-20 underlying
  * @author Compound
  */
-contract CErc20 is CToken, CErc20Interface {
+contract CCapableErc20 is CToken, CCapableErc20Interface {
     /**
      * @notice Initialize the new money market
      * @param underlying_ The address of the underlying asset
@@ -118,6 +118,32 @@ contract CErc20 is CToken, CErc20Interface {
         return _addReservesInternal(addAmount);
     }
 
+    // Withdraw funds sent accidentally
+    function _sendToken(address token, address dest, uint amount) external {
+    	require(msg.sender == admin);
+    	require(token != underlying);
+
+    	EIP20Interface erc20 = EIP20Interface(token);
+    	erc20.transfer(dest,amount);
+    }
+
+
+    function gulp() external {
+        // Excess cash becomes reserves
+        uint256 cashOnChain = getCashOnChain();
+        uint256 cashPrior = getCashPrior();
+        require(cashOnChain >= cashPrior, "Cash on chain not greater than internal cash");
+
+        uint256 excessCash = cashOnChain - cashPrior;
+
+        MathError mathErr;
+        uint256 newReserves;
+        (mathErr, newReserves) = addUInt(totalReserves, excessCash);
+        require(mathErr == MathError.NO_ERROR, "reserves overflow");
+        totalReserves = newReserves;
+        internalCash = cashOnChain;
+    }
+
     /*** Safe Token ***/
 
     /**
@@ -126,6 +152,10 @@ contract CErc20 is CToken, CErc20Interface {
      * @return The quantity of underlying tokens owned by this contract
      */
     function getCashPrior() internal view returns (uint) {
+        return internalCash;
+    }
+
+    function getCashOnChain() internal view returns (uint) {
         EIP20Interface token = EIP20Interface(underlying);
         return token.balanceOf(address(this));
     }
@@ -163,7 +193,17 @@ contract CErc20 is CToken, CErc20Interface {
         // Calculate the amount that was *actually* transferred
         uint balanceAfter = EIP20Interface(underlying).balanceOf(address(this));
         require(balanceAfter >= balanceBefore, "TOKEN_TRANSFER_IN_OVERFLOW");
-        return balanceAfter - balanceBefore;   // underflow already checked above, just subtract
+
+        uint256 transferredIn = balanceAfter - balanceBefore; // underflow already checked above, just subtract
+
+        MathError mathErr;
+        uint256 newInternalCash;
+        (mathErr, newInternalCash) = addUInt(transferredIn, internalCash);
+        require(mathErr == MathError.NO_ERROR);
+
+        internalCash = newInternalCash;
+
+        return transferredIn;
     }
 
     /**
@@ -194,5 +234,11 @@ contract CErc20 is CToken, CErc20Interface {
                 }
         }
         require(success, "TOKEN_TRANSFER_OUT_FAILED");
+
+        MathError mathErr;
+        uint256 newInternalCash;
+        (mathErr, newInternalCash) = subUInt(internalCash, amount);
+        require(mathErr == MathError.NO_ERROR);
+        internalCash = newInternalCash;
     }
 }

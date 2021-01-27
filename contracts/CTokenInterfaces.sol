@@ -116,7 +116,7 @@ contract CTokenStorage {
     mapping(address => BorrowSnapshot) internal accountBorrows;
 }
 
-contract CTokenInterface {
+contract CTokenInterface is CTokenStorage {
     /**
      * @notice Indicator that this is a CToken contract (for inspection)
      */
@@ -183,12 +183,6 @@ contract CTokenInterface {
      */
     event NewReserveFactor(uint oldReserveFactorMantissa, uint newReserveFactorMantissa);
 
-
-    /**
-     * @notice Event emitted when the underlying supply cap is changed
-     */
-     event NewUnderlyingSupplyCap(uint oldUnderlyingSupplyCap, uint newUnderlyingSupplyCap);
-
     /**
      * @notice Event emitted when the reserves are added
      */
@@ -254,14 +248,7 @@ contract CErc20Storage {
     address public underlying;
 }
 
-contract CErc20Storage2 is CErc20Storage {
-    /**
-    * @notice Internal cash counter for this CToken. Should equal underlying.balanceOf(address(this)) for CERC20.
-    */
-    uint256 public internalCash;
-}
-
-contract CErc20Interface is CErc20Storage2 {
+contract CErc20Interface is CErc20Storage {
 
     /*** User Interface ***/
 
@@ -272,8 +259,31 @@ contract CErc20Interface is CErc20Storage2 {
     function repayBorrow(uint repayAmount) external returns (uint);
     function repayBorrowBehalf(address borrower, uint repayAmount) external returns (uint);
     function liquidateBorrow(address borrower, uint repayAmount, CTokenInterface cTokenCollateral) external returns (uint);
-    function gulp() external;
 
+
+    /*** Admin Functions ***/
+
+    function _addReserves(uint addAmount) external returns (uint);
+}
+
+contract CCapableErc20Storage is CErc20Storage {
+    /**
+    * @notice Internal cash counter for this CToken. Should equal underlying.balanceOf(address(this)) for CERC20.
+    */
+    uint256 public internalCash;
+}
+
+contract CCapableErc20Interface is CCapableErc20Storage {
+    /*** User Interface ***/
+
+    function mint(uint mintAmount) external returns (uint);
+    function redeem(uint redeemTokens) external returns (uint);
+    function redeemUnderlying(uint redeemAmount) external returns (uint);
+    function borrow(uint borrowAmount) external returns (uint);
+    function repayBorrow(uint repayAmount) external returns (uint);
+    function repayBorrowBehalf(address borrower, uint repayAmount) external returns (uint);
+    function liquidateBorrow(address borrower, uint repayAmount, CTokenInterface cTokenCollateral) external returns (uint);
+    function gulp() external;
 
     /*** Admin Functions ***/
 
