@@ -238,7 +238,6 @@ contract CTokenInterface is CTokenStorage {
     function _setReserveFactor(uint newReserveFactorMantissa) external returns (uint);
     function _reduceReserves(uint reduceAmount) external returns (uint);
     function _setInterestRateModel(InterestRateModel newInterestRateModel) public returns (uint);
-    function _setUnderlyingSupplyCap(uint newUnderlyingSupplyCap) external;
 }
 
 contract CErc20Storage {
@@ -266,14 +265,7 @@ contract CErc20Interface is CErc20Storage {
     function _addReserves(uint addAmount) external returns (uint);
 }
 
-contract CCapableErc20Storage is CErc20Storage {
-    /**
-    * @notice Internal cash counter for this CToken. Should equal underlying.balanceOf(address(this)) for CERC20.
-    */
-    uint256 public internalCash;
-}
-
-contract CCapableErc20Interface is CCapableErc20Storage {
+contract CCapableErc20Interface is CErc20Storage {
     /*** User Interface ***/
 
     function mint(uint mintAmount) external returns (uint);
@@ -297,6 +289,13 @@ contract CDelegationStorage {
     address public implementation;
 }
 
+contract CDelegationStorage2 is CDelegationStorage {
+    /**
+    * @notice Internal cash counter for this CToken. Should equal underlying.balanceOf(address(this)) for CERC20.
+    */
+    uint256 public internalCash;
+}
+
 contract CDelegatorInterface is CDelegationStorage {
     /**
      * @notice Emitted when implementation is changed
@@ -313,6 +312,20 @@ contract CDelegatorInterface is CDelegationStorage {
 }
 
 contract CDelegateInterface is CDelegationStorage {
+    /**
+     * @notice Called by the delegator on a delegate to initialize it for duty
+     * @dev Should revert if any issues arise which make it unfit for delegation
+     * @param data The encoded bytes data for any initialization
+     */
+    function _becomeImplementation(bytes memory data) public;
+
+    /**
+     * @notice Called by the delegator on a delegate to forfeit its responsibility
+     */
+    function _resignImplementation() public;
+}
+
+contract CCapableDelegateInterface is CDelegationStorage2 {
     /**
      * @notice Called by the delegator on a delegate to initialize it for duty
      * @dev Should revert if any issues arise which make it unfit for delegation

@@ -7,7 +7,7 @@ import "./CToken.sol";
  * @notice CTokens which wrap an EIP-20 underlying
  * @author Compound
  */
-contract CCapableErc20 is CToken, CCapableErc20Interface {
+contract CCapableErc20 is CToken, CCapableErc20Interface, CCapableDelegateInterface {
     /**
      * @notice Initialize the new money market
      * @param underlying_ The address of the underlying asset

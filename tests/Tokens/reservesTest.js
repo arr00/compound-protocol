@@ -106,7 +106,6 @@ describe('CToken', function () {
       expect(
         await send(cToken.underlying, 'harnessSetBalance', [cToken._address, cash])
       ).toSucceed();
-      await send(cToken, 'gulp');
     });
 
     it("fails if called by non-admin", async () => {

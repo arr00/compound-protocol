@@ -265,18 +265,6 @@ async function setReserveFactor(world: World, from: string, cToken: CToken, rese
   return world;
 }
 
-async function setUnderlyingSupplyCap(world: World, from: string, cToken: CToken, underlyingSupplyCap: NumberV): Promise<World> {
-  let invokation = await invoke(world, cToken.methods._setUnderlyingSupplyCap(underlyingSupplyCap.encode()), from, CTokenErrorReporter);
-
-  world = addAction(
-    world,
-    `CToken ${cToken.name}: ${describeUser(world, from)} sets underlying supply cap to ${underlyingSupplyCap.show()}`,
-    invokation
-  );
-
-  return world;
-}
-
 async function gulp(world: World, from: string, cToken: CToken): Promise<World> {
   let invokation = await invoke(world, cToken.methods.gulp(), from, CTokenErrorReporter);
 
@@ -744,20 +732,6 @@ export function cTokenCommands() {
         new Arg("reserveFactor", getExpNumberV)
       ],
       (world, from, { cToken, reserveFactor }) => setReserveFactor(world, from, cToken, reserveFactor),
-      { namePos: 1 }
-    ),
-    new Command<{ cToken: CToken, underlyingSupplyCap: NumberV }>(`
-        #### SetUnderlyingSupplyCap
-
-        * "CToken <cToken> SetUnderlyingSupplyCap underlyingSupplyCap:<Number>" - Sets the underlying supply cap for the cToken
-          * E.g. "CToken cZRX SetUnderlyingSupplyCap 100e18"
-      `,
-      "SetUnderlyingSupplyCap",
-      [
-        new Arg("cToken", getCTokenV),
-        new Arg("underlyingSupplyCap", getNumberV)
-      ],
-      (world, from, { cToken, underlyingSupplyCap }) => setUnderlyingSupplyCap(world, from, cToken, underlyingSupplyCap),
       { namePos: 1 }
     ),
     new Command<{ cToken: CToken}>(`
