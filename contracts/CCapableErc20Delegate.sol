@@ -21,11 +21,6 @@ contract CCapableErc20Delegate is CCapableErc20 {
         // Shh -- currently unused
         data;
 
-        // Shh -- we don't ever want this hook to be marked pure
-        if (false) {
-            implementation = address(0);
-        }
-
         require(msg.sender == admin, "only the admin may call _becomeImplementation");
 
         // Set internal cash when becoming implementation
