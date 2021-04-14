@@ -58,7 +58,7 @@ contract GovernorBravoDelegateTestnetHarness is GovernorBravoDelegate {
         proposalThreshold = proposalThreshold_;
     }
 
-        /**
+    /**
       * @notice Admin function for setting the voting delay
       * @param newVotingDelay new voting delay, in blocks
       */
