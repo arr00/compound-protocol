@@ -30,7 +30,7 @@ contract GovernorBravoDelegateTestnetHarness is GovernorBravoDelegate {
     /**
      * @notice Harness initiate the GovenorBravo contract
      * @dev This function bypasses the need to initiate the GovernorBravo contract from an existing GovernorAlpha for testnet usage.
-     * @param acceptAdmin - should accept admin be called
+     * @param acceptAdmin - should accept admin be called on timelock
      */
     function _initiate(bool acceptAdmin) external {
         require(msg.sender == admin, "GovernorBravo::_initiate: admin only");
@@ -56,5 +56,29 @@ contract GovernorBravoDelegateTestnetHarness is GovernorBravoDelegate {
         votingPeriod = votingPeriod_;
         votingDelay = votingDelay_;
         proposalThreshold = proposalThreshold_;
+    }
+
+        /**
+      * @notice Admin function for setting the voting delay
+      * @param newVotingDelay new voting delay, in blocks
+      */
+    function _setVotingDelay(uint newVotingDelay) external {
+        require(msg.sender == admin, "GovernorBravo::_setVotingDelay: admin only");
+        uint oldVotingDelay = votingDelay;
+        votingDelay = newVotingDelay;
+
+        emit VotingDelaySet(oldVotingDelay,votingDelay);
+    }
+
+    /**
+      * @notice Admin function for setting the voting period
+      * @param newVotingPeriod new voting period, in blocks
+      */
+    function _setVotingPeriod(uint newVotingPeriod) external {
+        require(msg.sender == admin, "GovernorBravo::_setVotingPeriod: admin only");
+        uint oldVotingPeriod = votingPeriod;
+        votingPeriod = newVotingPeriod;
+
+        emit VotingPeriodSet(oldVotingPeriod, votingPeriod);
     }
 }
