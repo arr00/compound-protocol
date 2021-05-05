@@ -1,7 +1,6 @@
 const {
   etherUnsigned,
-  etherMantissa,
-  UInt256Max
+  etherMantissa
 } = require('../Utils/Ethereum');
 
 const {
@@ -20,9 +19,9 @@ const {
 
 const exchangeRate = 50e3;
 const mintAmount = etherUnsigned(10e4);
-const mintTokens = mintAmount.dividedBy(exchangeRate);
+const mintTokens = mintAmount.div(exchangeRate);
 const redeemTokens = etherUnsigned(10e3);
-const redeemAmount = redeemTokens.multipliedBy(exchangeRate);
+const redeemAmount = redeemTokens.mul(exchangeRate);
 
 async function preMint(cToken, minter, mintAmount, mintTokens, exchangeRate) {
   await preApprove(cToken, minter, mintAmount);
@@ -198,7 +197,7 @@ describe('CToken', function () {
 
       it("fails if exchange calculation fails", async () => {
         if (redeemFresh == redeemFreshTokens) {
-          expect(await send(cToken, 'harnessSetExchangeRate', [UInt256Max()])).toSucceed();
+          expect(await send(cToken, 'harnessSetExchangeRate', [-1])).toSucceed();
           expect(await redeemFresh(cToken, redeemer, redeemTokens, redeemAmount)).toHaveTokenFailure('MATH_ERROR', 'REDEEM_EXCHANGE_TOKENS_CALCULATION_FAILED');
         } else {
           expect(await send(cToken, 'harnessSetExchangeRate', [0])).toSucceed();

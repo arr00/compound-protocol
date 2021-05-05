@@ -1,22 +1,24 @@
 pragma solidity ^0.5.16;
 
-import "./JumpRateModelV2.sol";
+import "./JumpRateModel.sol";
 import "./SafeMath.sol";
 
 /**
-  * @title Compound's DAIInterestRateModel Contract (version 3)
+  * @title Compound's DAIInterestRateModel Contract (version 2)
   * @author Compound (modified by Dharma Labs)
   * @notice The parameterized model described in section 2.4 of the original Compound Protocol whitepaper.
-  * Version 3 modifies the interest rate model in Version 2 by increasing the initial "gap" or slope of
-  * the model prior to the "kink" from 2% to 4%, and enabling updateable parameters.
+  * Version 2 modifies the original interest rate model by increasing the "gap" or slope of the model prior
+  * to the "kink" from 0.05% to 2% with the goal of "smoothing out" interest rate changes as the utilization
+  * rate increases.
   */
-contract DAIInterestRateModelV3 is JumpRateModelV2 {
+contract DAIInterestRateModelV2 is JumpRateModel {
     using SafeMath for uint;
 
     /**
-     * @notice The additional margin per block separating the base borrow rate from the roof.
+     * @notice The additional margin per block separating the base borrow rate from the roof (2% / block).
+     * Note that this value has been increased from the original value of 0.05% per block.
      */
-    uint public gapPerBlock;
+    uint public constant gapPerBlock = 2e16 / blocksPerYear;
 
     /**
      * @notice The assumed (1 - reserve factor) used to calculate the minimum borrow rate (reserve factor = 0.05)
@@ -32,26 +34,10 @@ contract DAIInterestRateModelV3 is JumpRateModelV2 {
      * @param kink_ The utilization point at which the jump multiplier is applied
      * @param pot_ The address of the Dai pot (where DSR is earned)
      * @param jug_ The address of the Dai jug (where SF is kept)
-     * @param owner_ The address of the owner, i.e. the Timelock contract (which has the ability to update parameters directly)
      */
-    constructor(uint jumpMultiplierPerYear, uint kink_, address pot_, address jug_, address owner_) JumpRateModelV2(0, 0, jumpMultiplierPerYear, kink_, owner_) public {
-        gapPerBlock = 4e16 / blocksPerYear;
+    constructor(uint jumpMultiplierPerYear, uint kink_, address pot_, address jug_) JumpRateModel(0, 0, jumpMultiplierPerYear, kink_) public {
         pot = PotLike(pot_);
         jug = JugLike(jug_);
-        poke();
-    }
-
-    /**
-     * @notice External function to update the parameters of the interest rate model
-     * @param baseRatePerYear The approximate target base APR, as a mantissa (scaled by 1e18). For DAI, this is calculated from DSR and SF. Input not used.
-     * @param gapPerYear The Additional margin per year separating the base borrow rate from the roof. (scaled by 1e18)
-     * @param jumpMultiplierPerYear The jumpMultiplierPerYear after hitting a specified utilization point
-     * @param kink_ The utilization point at which the jump multiplier is applied
-     */
-    function updateJumpRateModel(uint baseRatePerYear, uint gapPerYear, uint jumpMultiplierPerYear, uint kink_) external {
-        require(msg.sender == owner, "only the owner may call this function.");
-        gapPerBlock = gapPerYear / blocksPerYear;
-        updateJumpRateModelInternal(0, 0, jumpMultiplierPerYear, kink_);
         poke();
     }
 
