@@ -143,3 +143,12 @@ contract ComptrollerV5Storage is ComptrollerV4Storage {
     /// @notice Last block at which a contributor's COMP rewards have been allocated
     mapping(address => uint) public lastContributorBlock;
 }
+
+contract ComptrollerV6Storage is ComptrollerV5Storage {
+    /// @notice The rate at which comp is distributed to the corresponding borrow market
+    mapping(address => uint) public borrowCompSpeeds;
+
+    /// @notice The rate at which comp is distributed to the corresponding borrow market
+    mapping(address => uint) public supplyCompSpeeds;
+}
+
